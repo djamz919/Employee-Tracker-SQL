@@ -1,0 +1,25 @@
+{
+  "name": "employee-tracker-sql",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/djamz919/Employee-Tracker-SQL.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/djamz919/Employee-Tracker-SQL/issues"
+  },
+  "homepage": "https://github.com/djamz919/Employee-Tracker-SQL#readme",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "inquirer": "^8.2.0",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.3.3"
+  }
+}
