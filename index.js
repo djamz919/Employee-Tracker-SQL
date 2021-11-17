@@ -199,28 +199,28 @@ const updateEmpRole = () => {
 let showMenu = true;
 
 // while (showMenu) {
-//     promptUserMenu()
-//         .then(option => {
-//             switch (option) {
-//                 case viewDept:
-//                     return viewAllDepartment();
-//                 case viewRole:
-//                     return viewAllRole();
-//                 case viewEmp:
-//                     return viewAllEmp();
-//                 case addDept:
-//                     return addNewDept();
-//                 case addRole:
-//                     return addNewRole();
-//                 case addEmp:
-//                     return addNewEmp();
-//                 case updateRole:
-//                     return updateEmpRole();
-//                 case quit:
-//                     showMenu = false;
-//                     break;
-//             };
-//         });
+    promptUserMenu()
+        .then(option => {
+            switch (option) {
+                case viewDept:
+                    return viewAllDepartment();
+                case viewRole:
+                    return viewAllRole();
+                case viewEmp:
+                    return viewAllEmp();
+                case addDept:
+                    return addNewDept();
+                case addRole:
+                    return addNewRole();
+                case addEmp:
+                    return addNewEmp();
+                case updateRole:
+                    return updateEmpRole();
+                case quit:
+                    showMenu = false;
+                    break;
+            };
+        });
 // }
 
 // After adding a new item, call the get function to refresh the contents of that item.
