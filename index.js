@@ -11,33 +11,6 @@ const menuArray = ["View all departments", "View all roles", "View all employees
 let allDepartments = [];
 let allRoles = [];
 
-dbquery.viewAllDept().then(results => {
-    console.log(results[0])}
-    //results
-);
-
-//getDepartments.then(getRoles).then(getEmployees) to populate things first before menu
-
-//
-
-// const sql = `SELECT name FROM department`;
-
-// db.query(sql, (err, result) => {
-//     if (err) {
-//         console.log(err);
-//     }
-//     console.log("log from dbquery method: "+JSON.stringify(result));
-//     result.forEach(el => {
-//         console.log(el.name);
-//         allDepartments.push(el.name);
-//     })
-// });
-
-// let allRoles = dbquery.viewAllRoles();
-
-//console.log("I'm displaying all the departments:" + allDepartments);
-// console.log("I'm displaying all the roles:" + allRoles);
-
 // Menu 
 const promptUserMenu = () => {
     return inquirer.prompt([
@@ -47,20 +20,60 @@ const promptUserMenu = () => {
             message: "What would you like to do?",
             choices: menuArray
         }
-    ]);
+    ]).then(option => {
+        switch (option.action) {
+            case viewDept:
+                viewAllDepartment();
+                break;
+            case viewRole:
+                viewAllRole();
+                break;
+            case viewEmp:
+                viewAllEmp();
+                break;
+            case addDept:
+                addNewDept();
+                break;
+            case addRole:
+                addNewRole();
+                break;
+            case addEmp:
+                addNewEmp();
+                break;
+            case updateRole:
+                updateEmpRole();
+                break;
+            case quit:
+                break;
+        };
+    });
 };
 
-const viewAllDepartment = () => {
+const viewAllDepartment = async () => {
     //use dbquery.methods to get database information
-    // dbquery.viewAllDept.
+    await dbquery.viewAllDept().then(results => {
+        console.table(results[0])
+    });
+
+    await promptUserMenu();
 }
 
-const viewAllRole = () => {
+const viewAllRole = async () => {
     //use dbquery.methods to get database information
+    await dbquery.viewAllRoles().then(results => {
+        console.table(results[0])
+    });
+
+    await promptUserMenu();
 }
 
-const viewAllEmp = () => {
+const viewAllEmp = async () => {
     //use dbquery.methods to get database information
+    await dbquery.viewAllEmployees().then(results => {
+        console.table(results[0])
+    });
+
+    await promptUserMenu();
 }
 
 const addNewDept = () => {
@@ -78,11 +91,18 @@ const addNewDept = () => {
                 }
             }
         }
-    ])
-        .then(deptInput => {
-            return addNewDepartment(deptInput);
-            //use dbquery.methods to publish new information to database
+    ]).then(async deptInput => {
+        //use dbquery.methods to publish new information to database
+        await dbquery.addNewDepartment(deptInput.department).then(() => {
+            console.log('New Department Added!');
+        })
+
+        await dbquery.viewAllDept().then(results => {
+            console.table(results[0])
         });
+        
+        await promptUserMenu();
+    });
 }
 
 const addNewRole = () => {
@@ -196,31 +216,7 @@ const updateEmpRole = () => {
         .then() //use dbquery.methods to publish new information to database)
 }
 
-let showMenu = true;
+promptUserMenu();
 
-// while (showMenu) {
-    promptUserMenu()
-        .then(option => {
-            switch (option) {
-                case viewDept:
-                    return viewAllDepartment();
-                case viewRole:
-                    return viewAllRole();
-                case viewEmp:
-                    return viewAllEmp();
-                case addDept:
-                    return addNewDept();
-                case addRole:
-                    return addNewRole();
-                case addEmp:
-                    return addNewEmp();
-                case updateRole:
-                    return updateEmpRole();
-                case quit:
-                    showMenu = false;
-                    break;
-            };
-        });
-// }
 
 // After adding a new item, call the get function to refresh the contents of that item.

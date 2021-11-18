@@ -11,49 +11,35 @@ class Query {
     }
 
     //view all departments
-    viewAllDept(){
-        const sql = `SELECT name FROM department`;
+    async viewAllDept(){
+        const sql = `SELECT department.name AS Name FROM department`;
 
-        return this.connection.promise().query(sql);
+        return this.connection.promise().query(sql); 
     }
 
     //view all roles
     viewAllRoles(){
-        const sql = `SELECT title FROM role`;
+        const sql = `SELECT role.title AS Role, role.salary AS Salary, department.name AS department
+                    FROM role JOIN department ON role.department_id = department.id`;
 
-        this.connection.query(sql, (err, result) => {
-            if (err) {
-                console.log(err);
-            }
-            console.log("log from dbquery method: "+JSON.stringify(result));
-            return JSON.stringify(result);
-        });
+        return this.connection.promise().query(sql);
     }
 
     //view all employees
     viewAllEmployees(){
-        const sql = `SELECT first_name, last_name FROM employee`;
+        const sql = `SELECT role.first_name AS 'First Name', role.last_name AS 'Last name', role.title AS Role, employee.manager_id AS manager
+                    FROM employee LEFT JOIN department ON employee.role_id = role.id LEFT JOIN employee ON employee.manager_id = employee.id`
 
-        this.connection.promise.query(sql, (err, result) => {
-            if (err) {
-                console.log(err);
-            }
-            console.log(result);
-        });
+        return this.connection.promise().query(sql);
     }
 
     //add a department
-    addNewDepartment(newDept){
+    async addNewDepartment(newDept){
         const sql = `INSERT INTO department (name) VALUES (?)`
 
-        this.connection.promise.query(sql, newDept, (err, result) => {
-            if (err) {
-                console.log(err);
-            }
-            console.log(result);
-        });
+        return this.connection.promise().query(sql, newDept);
     }
-
+    
     //add a role
     addNewRole(newRole){
 
