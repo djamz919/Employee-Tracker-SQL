@@ -103,7 +103,9 @@ class Query {
 
     //update employee role
     updateEmployeeRole(empId, roleId){
-        const sql = `UPDATE employee `;
+        const empArray = [roleId, empId];
+
+        const sql = `UPDATE employee SET role_id = ? WHERE id = ?`;
 
         return this.connection.promise().query(sql, empArray);
     }

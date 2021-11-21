@@ -287,6 +287,8 @@ const updateEmpRole = () => {
             roleId = result[0][0].id;
         });
 
+        console.log(empId, roleId);
+
         await dbquery.updateEmployeeRole(empId, roleId);
 
         await viewAllEmp();

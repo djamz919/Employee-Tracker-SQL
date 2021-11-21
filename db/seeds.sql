@@ -27,7 +27,7 @@ VALUES
     ("Mike", "Chan", 1, 1),
     ("Hannah", "Adams", 3, 1),
     ("Abhishek", "Arya", 7, null),
-    ("David", "Shi", 6, 3),
+    ("David", "Shi", 6, 4),
     ("Kunal", "Singh", 5, null),
     ("Elijah", "Viola", 4, 6),
     ("Dianne", "Ruth", 8, null),
