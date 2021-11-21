@@ -2,7 +2,7 @@
 // Import dependencies
 const inquirer = require('inquirer');
 const db = require('./db/connection.js');
-const { getDeptId } = require('./dbquery.js');
+const { getDeptId, getManagerId, getRoleId } = require('./dbquery.js');
 const dbquery = require('./dbquery.js');
 //missing console table 
 
@@ -129,11 +129,7 @@ const addNewDept = () => {
             console.log('New Department Added!');
         })
 
-        await dbquery.viewAllDept().then(results => {
-            console.table(results[0])
-        });
-
-        await promptUserMenu();
+        viewAllDepartment();
     });
 }
 
@@ -177,17 +173,13 @@ const addNewRole = () => {
         allRoles.push(newRoleInput.role);
         let deptId = 0;
 
-        await dbquery.getDeptId(newRoleInput.department).then(async result => {
+        await dbquery.getDeptId(newRoleInput.department).then(result => {
             deptId = result[0][0].id;
         });
     
         await dbquery.addNewRole(newRoleInput, deptId);
 
-        await dbquery.viewAllRoles().then(results => {
-            console.table(results[0]);
-        })
-
-        await promptUserMenu();
+        viewAllRole();
     });
 }
 
@@ -231,8 +223,29 @@ const addNewEmp = () => {
             message: "Select the new employee's manager",
             choices: allManagers
         }
-    ]).then(empInput => {
-        console.log(empInput);
+    ]).then(async empInput => {
+        let roleId = 0;
+        let managerId = null;
+
+        if (empInput.manager !== 'No Manager'){
+            await dbquery.getManagerId(empInput.manager).then(async result => {
+                managerId = result[0][0].id;
+            })
+        }
+
+        await dbquery.getRoleId(empInput.role).then(async result => {
+            roleId = result[0][0].id;
+        });
+
+        console.log(roleId, managerId);
+    
+        await dbquery.addNewEmployee(empInput, roleId, managerId);
+
+        await dbquery.viewAllEmployees().then(results => {
+            console.table(results[0]);
+        })
+
+        await viewAllEmp();
     });
 }
 

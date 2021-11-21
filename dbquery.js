@@ -85,7 +85,15 @@ class Query {
         return this.connection.promise().query(sql, roleArray);
     }
 
-    //add an employee
+    //add a new employee
+    addNewEmployee(newEmp, roleId, managerId) {
+        const empArray = [newEmp.firstname, newEmp.lastname, roleId, managerId]
+
+        const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`
+
+        return this.connection.promise().query(sql, empArray);
+    }
+
     //update employee role
 
     //db.promise().query("...") to return a promise to index.js
