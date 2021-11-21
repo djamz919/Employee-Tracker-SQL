@@ -2,7 +2,6 @@
 // Import dependencies
 const inquirer = require('inquirer');
 const db = require('./db/connection.js');
-const { getDeptId, getManagerId, getRoleId } = require('./dbquery.js');
 const dbquery = require('./dbquery.js');
 //missing console table 
 
@@ -12,6 +11,7 @@ const menuArray = ["View all departments", "View all roles", "View all employees
 let allDepartments = [];
 let allRoles = [];
 let allManagers = [];
+let allEmployees = [];
 
 // Setup allDepartments
 const resetAllDepts = async () => {
@@ -38,6 +38,15 @@ const resetAllManagers = async () => {
             allManagers.push(element.Manager);
         });
         allManagers.push('No Manager');
+    });
+}
+
+// Setup allEmployees
+const resetAllEmployees = async () => {
+    await dbquery.getEmployees().then(results => {
+        results[0].forEach(element => {
+            allEmployees.push(element.Employee);
+        });
     });
 }
 
@@ -176,7 +185,7 @@ const addNewRole = () => {
         await dbquery.getDeptId(newRoleInput.department).then(result => {
             deptId = result[0][0].id;
         });
-    
+
         await dbquery.addNewRole(newRoleInput, deptId);
 
         viewAllRole();
@@ -227,10 +236,10 @@ const addNewEmp = () => {
         let roleId = 0;
         let managerId = null;
 
-        if (empInput.manager !== 'No Manager'){
-            await dbquery.getManagerId(empInput.manager).then(async result => {
+        if (empInput.manager !== 'No Manager') {
+            await dbquery.getEmployeeId(empInput.manager).then(async result => {
                 managerId = result[0][0].id;
-            })
+            });
         }
 
         await dbquery.getRoleId(empInput.role).then(async result => {
@@ -238,25 +247,58 @@ const addNewEmp = () => {
         });
 
         console.log(roleId, managerId);
-    
+
         await dbquery.addNewEmployee(empInput, roleId, managerId);
 
-        await dbquery.viewAllEmployees().then(results => {
-            console.table(results[0]);
-        })
+        if (empInput.manager === 'No Manager') {
+            await resetAllManagers();
+        }
+
+        await resetAllEmployees();
 
         await viewAllEmp();
     });
 }
 
 const updateEmpRole = () => {
-    return inquirer.prompt()
-        .then() //use dbquery.methods to publish new information to database)
+    return inquirer.prompt([
+        {
+            type: "list",
+            name: "employee",
+            message: "Select an employee to update",
+            choices: allEmployees
+        },
+        {
+            type: "list",
+            name: "role",
+            message: "Select the employee's new role",
+            choices: allRoles
+        }
+    ]).then(async input => {
+        //use dbquery.methods to publish new information to database)
+        let empId = 0;
+        let roleId = 0;
+
+        await dbquery.getEmployeeId(input.employee).then(async result => {
+            empId = result[0][0].id;
+        });
+
+        await dbquery.getRoleId(input.role).then(async result => {
+            roleId = result[0][0].id;
+        });
+
+        await dbquery.updateEmployeeRole(empId, roleId);
+
+        await viewAllEmp();
+    }) 
 }
+
+//Update global variables
 resetAllDepts();
 resetAllRoles();
 resetAllManagers();
+resetAllEmployees();
 
+//User menu
 promptUserMenu();
 
-// After adding a new item, call the get function to refresh the contents of that item.

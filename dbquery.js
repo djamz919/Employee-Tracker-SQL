@@ -23,9 +23,9 @@ class Query {
         return this.connection.promise().query(sql, roleName);
     }
 
-    //get index of manager id
-    async getManagerId(managerName) {
-        const nameArray = managerName.split(' ');
+    //get index of employee id
+    async getEmployeeId(employeeName) {
+        const nameArray = employeeName.split(' ');
 
         const sql = `SELECT id FROM employee WHERE first_name = (?) AND last_name = (?)`
 
@@ -42,6 +42,13 @@ class Query {
     //get all managers
     async getManagers(){
         const sql = `SELECT CONCAT(employee.first_name, " ", employee.last_name) AS Manager FROM employee WHERE manager_id IS NULL`
+
+        return this.connection.promise().query(sql);
+    }
+
+    //get all employees
+    async getEmployees(){
+        const sql = `SELECT CONCAT(employee.first_name, " ", employee.last_name) AS Employee FROM employee`
 
         return this.connection.promise().query(sql);
     }
@@ -63,8 +70,8 @@ class Query {
 
     //view all employees
     viewAllEmployees() {
-        const sql = `SELECT employee.first_name AS 'First Name', employee.last_name AS 'Last Name', role.title AS Title, department.name AS Department, role.salary AS Salary, CONCAT(employee.first_name, " ", employee.last_name) AS Manager
-                    FROM employee JOIN role ON employee.role_id = role.id JOIN department on role.department_id = department.id LEFT JOIN employee e ON employee.manager_id = e.id`
+        const sql = `SELECT emp.first_name AS 'First Name', emp.last_name AS 'Last Name', role.title AS Title, department.name AS Department, role.salary AS Salary, CONCAT(COALESCE(manager.first_name, "null"), " ", manager.last_name) AS Manager
+                    FROM employee emp JOIN role ON emp.role_id = role.id JOIN department on role.department_id = department.id LEFT JOIN employee manager ON emp.manager_id = manager.id`;
 
         return this.connection.promise().query(sql);
     }
@@ -78,7 +85,7 @@ class Query {
 
     //add a role
     addNewRole(newRole, deptId) {
-        const roleArray = [newRole.role, newRole.salary, deptId]
+        const roleArray = [newRole.role, newRole.salary, deptId];
 
         const sql = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`
 
@@ -87,7 +94,7 @@ class Query {
 
     //add a new employee
     addNewEmployee(newEmp, roleId, managerId) {
-        const empArray = [newEmp.firstname, newEmp.lastname, roleId, managerId]
+        const empArray = [newEmp.firstname, newEmp.lastname, roleId, managerId];
 
         const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`
 
@@ -95,8 +102,11 @@ class Query {
     }
 
     //update employee role
+    updateEmployeeRole(empId, roleId){
+        const sql = `UPDATE employee `;
 
-    //db.promise().query("...") to return a promise to index.js
+        return this.connection.promise().query(sql, empArray);
+    }
 }
 
 module.exports = new Query(db);
