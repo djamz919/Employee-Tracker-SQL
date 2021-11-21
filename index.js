@@ -123,6 +123,8 @@ const addNewDept = () => {
         }
     ]).then(async deptInput => {
         //use dbquery.methods to publish new information to database
+        allDepartments.push(deptInput.department);
+
         await dbquery.addNewDepartment(deptInput.department).then(() => {
             console.log('New Department Added!');
         })
@@ -172,6 +174,7 @@ const addNewRole = () => {
 
     ]).then(async newRoleInput => {
         //use dbquery.methods to publish new information to database
+        allRoles.push(newRoleInput.role);
         let deptId = 0;
 
         await dbquery.getDeptId(newRoleInput.department).then(async result => {
@@ -179,6 +182,10 @@ const addNewRole = () => {
         });
     
         await dbquery.addNewRole(newRoleInput, deptId);
+
+        await dbquery.viewAllRoles().then(results => {
+            console.table(results[0]);
+        })
 
         await promptUserMenu();
     });
