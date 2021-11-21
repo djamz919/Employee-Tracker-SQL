@@ -2,6 +2,7 @@
 // Import dependencies
 const inquirer = require('inquirer');
 const db = require('./db/connection.js');
+const { getDeptId } = require('./dbquery.js');
 const dbquery = require('./dbquery.js');
 //missing console table 
 
@@ -10,6 +11,35 @@ const menuArray = ["View all departments", "View all roles", "View all employees
 
 let allDepartments = [];
 let allRoles = [];
+let allManagers = [];
+
+// Setup allDepartments
+const resetAllDepts = async () => {
+    await dbquery.viewAllDept().then(results => {
+        results[0].forEach(element => {
+            allDepartments.push(element.Name);
+        });
+    });
+}
+
+// Setup allRoles
+const resetAllRoles = async () => {
+    await dbquery.getRoleTitles().then(results => {
+        results[0].forEach(element => {
+            allRoles.push(element.Title);
+        });
+    });
+}
+
+// Setup allManagers
+const resetAllManagers = async () => {
+    await dbquery.getManagers().then(results => {
+        results[0].forEach(element => {
+            allManagers.push(element.Manager);
+        });
+        allManagers.push('No Manager');
+    });
+}
 
 // Menu 
 const promptUserMenu = () => {
@@ -100,7 +130,7 @@ const addNewDept = () => {
         await dbquery.viewAllDept().then(results => {
             console.table(results[0])
         });
-        
+
         await promptUserMenu();
     });
 }
@@ -140,10 +170,18 @@ const addNewRole = () => {
             choices: allDepartments
         }
 
-    ])
-        .then(newRoleInput => {
-            //use dbquery.methods to publish new information to database
+    ]).then(async newRoleInput => {
+        //use dbquery.methods to publish new information to database
+        let deptId = 0;
+
+        await dbquery.getDeptId(newRoleInput.department).then(async result => {
+            deptId = result[0][0].id;
         });
+    
+        await dbquery.addNewRole(newRoleInput, deptId);
+
+        await promptUserMenu();
+    });
 }
 
 const addNewEmp = () => {
@@ -175,48 +213,30 @@ const addNewEmp = () => {
             }
         },
         {
-            type: "input",
-            name: "department",
-            message: "Enter the new employee's department.",
-            validate: deptInput => {
-                if (deptInput) {
-                    return true;
-                } else {
-                    console.log("Please enter the new employee's department!");
-                    return false;
-                }
-            }
-        },
-        {
-            type: "input",
+            type: "list",
             name: "role",
-            message: "Enter the new employee's role.",
-            validate: roleInput => {
-                if (roleInput) {
-                    return true;
-                } else {
-                    console.log("Please enter the new employee's role!");
-                    return false;
-                }
-            }
+            message: "Select the new employee's role",
+            choices: allRoles
         },
         {
-            type: "input",
+            type: "list",
             name: "manager",
-            message: "Enter the new employee's manager, if none do not enter anything.",
+            message: "Select the new employee's manager",
+            choices: allManagers
         }
-    ])
-        .then(empInput => {
-            //use dbquery.methods to publish new information to database
-        });
+    ]).then(empInput => {
+        console.log(empInput);
+    });
 }
 
 const updateEmpRole = () => {
     return inquirer.prompt()
         .then() //use dbquery.methods to publish new information to database)
 }
+resetAllDepts();
+resetAllRoles();
+resetAllManagers();
 
 promptUserMenu();
-
 
 // After adding a new item, call the get function to refresh the contents of that item.

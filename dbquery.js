@@ -4,21 +4,57 @@ const db = require('./db/connection.js');
 // Check out how to add .promise() function for queries to make asynchronous
 // Write the prepared statements via Class
 class Query {
-    constructor(connection){
+    constructor(connection) {
         this.connection = connection;
         this.departments = [];
         this.roles = [];
     }
+    //get index of department
+    async getDeptId(deptName) {
+        const sql = `SELECT id FROM department WHERE name = (?)`
 
-    //view all departments
-    async viewAllDept(){
+        return this.connection.promise().query(sql, deptName);
+    }
+
+    //get index of role
+    async getRoleId(roleName) {
+        const sql = `SELECT id FROM role WHERE title = (?)`
+
+        return this.connection.promise().query(sql, roleName);
+    }
+
+    //get index of manager id
+    async getManagerId(managerName) {
+        const nameArray = managerName.split(' ');
+
+        const sql = `SELECT id FROM employee WHERE first_name = (?) AND last_name = (?)`
+
+        return this.connection.promise().query(sql, nameArray);
+    }
+
+    //get all role titles
+    async getRoleTitles(){
+        const sql = `SELECT role.title AS Title FROM role`;
+
+        return this.connection.promise().query(sql);
+    }
+
+    //get all managers
+    async getManagers(){
+        const sql = `SELECT CONCAT(employee.first_name, " ", employee.last_name) AS Manager FROM employee WHERE manager_id IS NULL`
+
+        return this.connection.promise().query(sql);
+    }
+
+    //view or get all departments
+    async viewAllDept() {
         const sql = `SELECT department.name AS Name FROM department`;
 
-        return this.connection.promise().query(sql); 
+        return this.connection.promise().query(sql);
     }
 
     //view all roles
-    viewAllRoles(){
+    viewAllRoles() {
         const sql = `SELECT role.title AS Role, role.salary AS Salary, department.name AS department
                     FROM role JOIN department ON role.department_id = department.id`;
 
@@ -26,23 +62,27 @@ class Query {
     }
 
     //view all employees
-    viewAllEmployees(){
-        const sql = `SELECT role.first_name AS 'First Name', role.last_name AS 'Last name', role.title AS Role, employee.manager_id AS manager
-                    FROM employee LEFT JOIN department ON employee.role_id = role.id LEFT JOIN employee ON employee.manager_id = employee.id`
+    viewAllEmployees() {
+        const sql = `SELECT employee.first_name AS 'First Name', employee.last_name AS 'Last Name', role.title AS Title, department.name AS Department, role.salary AS Salary, CONCAT(employee.first_name, " ", employee.last_name) AS Manager
+                    FROM employee JOIN role ON employee.role_id = role.id JOIN department on role.department_id = department.id LEFT JOIN employee e ON employee.manager_id = e.id`
 
         return this.connection.promise().query(sql);
     }
 
     //add a department
-    async addNewDepartment(newDept){
+    addNewDepartment(newDept) {
         const sql = `INSERT INTO department (name) VALUES (?)`
 
         return this.connection.promise().query(sql, newDept);
     }
-    
-    //add a role
-    addNewRole(newRole){
 
+    //add a role
+    addNewRole(newRole, deptId) {
+        const roleArray = [newRole.role, newRole.salary, deptId]
+
+        const sql = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`
+
+        return this.connection.promise().query(sql, roleArray);
     }
 
     //add an employee
