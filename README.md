@@ -24,5 +24,7 @@ The project must be run locally. Be sure to create a .env file in the same direc
 
 For all add and update options, simply follow the prompt on the CLI!
 
+To watch a sample walkthrough: https://drive.google.com/file/d/1XOFWLA56g3BIFLaOL2WCGfN6khL5QqSQ/view
+
 ## Questions
 For any questions, reach out to github.com/djamz919 via the following email address: djtm97@gmail.com.
